@@ -427,6 +427,7 @@
       font-weight: 800;
       font-size: .88rem;
     }
+    .bar-svg { flex-shrink: 0; }
     .bar-track {
       flex: 1;
       height: 30px;
@@ -518,7 +519,7 @@
     .footer-logo {
       font-family: var(--font-display);
       font-size: 1.4rem;
-      color: var(--teal);
+      color: var(--white-soft);
       text-decoration: none;
       display: inline-block;
       margin-bottom: 1.25rem;
@@ -526,6 +527,7 @@
       transition: opacity .2s;
     }
     .footer-logo:hover { opacity: 1; }
+    .footer-logo span { color: var(--teal); }
     .footer-links {
       display: flex;
       gap: 1.5rem;
@@ -684,19 +686,69 @@
     </div>
 
     <div class="bar-row">
-      <div class="bar-label" style="color:var(--green)">&#x1F41F; Green</div>
+      <div class="bar-label" style="color:var(--green)">
+        <!-- StreamlinedFish green -->
+        <svg class="bar-svg" viewBox="0 0 80 60" width="32" height="24" aria-hidden="true">
+          <path d="M20,30 L5,20 L15,29 L15,31 L5,40 Z" fill="#00E676"/>
+          <ellipse cx="44" cy="30" rx="24" ry="14" fill="#00E676" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+          <path d="M28,20 Q50,13 66,22" stroke="rgba(255,255,255,0.38)" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M28,16 Q42,6 58,16" stroke="#00E676" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <circle cx="63" cy="26" r="4" fill="white"/>
+          <circle cx="64" cy="26.5" r="2.2" fill="rgba(5,15,5,0.92)"/>
+          <circle cx="63" cy="25" r="1" fill="white"/>
+        </svg>
+        Green
+      </div>
       <div class="bar-track"><div class="bar-fill green" data-w="83">83%</div></div>
     </div>
     <div class="bar-row">
-      <div class="bar-label" style="color:var(--orange)">&#x1F990; Orange</div>
+      <div class="bar-label" style="color:var(--orange)">
+        <!-- Angelfish orange -->
+        <svg class="bar-svg" viewBox="0 0 80 60" width="32" height="24" aria-hidden="true">
+          <path d="M23,30 L6,20 L13,30 L6,40 Z" fill="#FF6D00"/>
+          <ellipse cx="43" cy="30" rx="20" ry="18" fill="#FF6D00" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+          <path d="M32,12 L38,2 L52,10 L60,12" stroke="#FF6D00" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M34,48 L40,58 L53,51 L60,48" stroke="#FF6D00" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M29,22 Q50,19 62,23" stroke="rgba(255,255,255,0.72)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <path d="M27,38 Q48,41 61,37" stroke="rgba(255,255,255,0.72)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <circle cx="57" cy="25" r="5" fill="white"/>
+          <circle cx="58" cy="25.5" r="2.8" fill="rgba(15,8,0,0.92)"/>
+          <circle cx="57" cy="24" r="1.2" fill="white"/>
+        </svg>
+        Orange
+      </div>
       <div class="bar-track"><div class="bar-fill orange" data-w="71">71%</div></div>
     </div>
     <div class="bar-row">
-      <div class="bar-label" style="color:var(--red)">&#x1F420; Red</div>
+      <div class="bar-label" style="color:var(--red)">
+        <!-- Clownfish red -->
+        <svg class="bar-svg" viewBox="0 0 80 60" width="32" height="24" aria-hidden="true">
+          <path d="M18,30 L4,20 L13,30 L4,40 Z" fill="#FF2D55"/>
+          <ellipse cx="42" cy="30" rx="24" ry="17" fill="#FF2D55" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+          <ellipse cx="42" cy="30" rx="5" ry="16" fill="rgba(255,255,255,0.88)"/>
+          <path d="M30,13 Q42,3 56,13" stroke="#FF2D55" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <circle cx="58" cy="25" r="5" fill="white"/>
+          <circle cx="59" cy="25.5" r="2.8" fill="rgba(15,5,5,0.92)"/>
+          <circle cx="57.5" cy="24" r="1.2" fill="white"/>
+        </svg>
+        Red
+      </div>
       <div class="bar-track"><div class="bar-fill red" data-w="68">68%</div></div>
     </div>
     <div class="bar-row">
-      <div class="bar-label" style="color:var(--yellow)">&#x1F421; Yellow</div>
+      <div class="bar-label" style="color:var(--yellow)">
+        <!-- Pufferfish yellow -->
+        <svg class="bar-svg" viewBox="0 0 80 60" width="32" height="24" aria-hidden="true">
+          <path d="M21,32 L8,23 L14,32 L8,41 Z" fill="#FFE500"/>
+          <ellipse cx="42" cy="32" rx="21" ry="19" fill="#FFE500" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+          <path d="M28,13 L31,7 L34,13 L37,7 L40,13 L43,7 L46,13 L49,7 L52,13" stroke="#FFE500" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="57" cy="27" r="6.5" fill="white"/>
+          <circle cx="58" cy="27.5" r="3.8" fill="rgba(10,10,5,0.92)"/>
+          <circle cx="56" cy="25.5" r="1.5" fill="white"/>
+          <path d="M64,35 Q67,37 64,39" stroke="rgba(0,0,0,0.22)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        Yellow
+      </div>
       <div class="bar-track"><div class="bar-fill yellow" data-w="54">54%</div></div>
     </div>
 
@@ -719,7 +771,6 @@
   <div class="download-content">
     <h2 class="download-title">Open a bag.<br><span class="accent">Start counting.</span></h2>
     <p class="download-sub">Free on Android. No account required. Just crack open a bag of Scandinavian Swimmers and start your first tally.</p>
-    <!-- Replace YOUR_PACKAGE_NAME with your actual Play Store package name -->
     <a href="https://play.google.com/store/apps/details?id=com.reeftally.app" class="btn-play">
       <svg width="30" height="30" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M8 4.5L41 24L8 43.5V4.5Z" fill="url(#pg2)"/>
@@ -741,7 +792,7 @@
 
 <!-- Footer -->
 <footer>
-  <a href="/" class="footer-logo">ReefTally</a>
+  <a href="/" class="footer-logo">Reef<span>Tally</span></a>
   <div class="footer-links">
     <a href="/privacy">Privacy Policy</a>
     <a href="/data-deletion">Data Deletion</a>
