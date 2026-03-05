@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReefTally — Which fish wins your bag?</title>
+  <meta name="description" content="Track your Trader Joe's Scandinavian Swimmers candy colors per bag. Count, compare, and see which fish wins globally.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ocean-deep: #020f1a;
+      --ocean-mid: #041828;
+      --teal: #00B4D8;
+      --red: #FF2D55;
+      --green: #00E676;
+      --yellow: #FFE500;
+      --orange: #FF6D00;
+      --white-soft: #E8F4F8;
+      --font-display: 'Lilita One', cursive;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ocean-deep);
+      color: var(--white-soft);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+
+    /* ── Bubbles ───────────────────────────────────── */
+    .bubbles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bubble {
+      position: absolute;
+      bottom: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(0,180,216,.25), rgba(0,180,216,.04));
+      border: 1px solid rgba(0,180,216,.12);
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(0) translateX(0); opacity: .7; }
+      50%  { transform: translateY(-50vh) translateX(18px); opacity: .4; }
+      100% { transform: translateY(-110vh) translateX(-8px); opacity: 0; }
+    }
+    .bubble:nth-child(1)  { width:8px;  height:8px;  left:5%;  animation-duration:12s; animation-delay:0s; }
+    .bubble:nth-child(2)  { width:4px;  height:4px;  left:15%; animation-duration:9s;  animation-delay:2s; }
+    .bubble:nth-child(3)  { width:12px; height:12px; left:25%; animation-duration:15s; animation-delay:1s; }
+    .bubble:nth-child(4)  { width:6px;  height:6px;  left:35%; animation-duration:11s; animation-delay:4s; }
+    .bubble:nth-child(5)  { width:3px;  height:3px;  left:45%; animation-duration:8s;  animation-delay:.5s; }
+    .bubble:nth-child(6)  { width:10px; height:10px; left:55%; animation-duration:13s; animation-delay:3s; }
+    .bubble:nth-child(7)  { width:5px;  height:5px;  left:65%; animation-duration:10s; animation-delay:1.5s; }
+    .bubble:nth-child(8)  { width:7px;  height:7px;  left:75%; animation-duration:14s; animation-delay:2.5s; }
+    .bubble:nth-child(9)  { width:4px;  height:4px;  left:85%; animation-duration:9s;  animation-delay:5s; }
+    .bubble:nth-child(10) { width:9px;  height:9px;  left:92%; animation-duration:11s; animation-delay:.8s; }
+    .bubble:nth-child(11) { width:6px;  height:6px;  left:10%; animation-duration:16s; animation-delay:6s; }
+    .bubble:nth-child(12) { width:3px;  height:3px;  left:50%; animation-duration:7s;  animation-delay:3.5s; }
+    .bubble:nth-child(13) { width:11px; height:11px; left:70%; animation-duration:18s; animation-delay:1.2s; }
+    .bubble:nth-child(14) { width:5px;  height:5px;  left:30%; animation-duration:10s; animation-delay:7s; }
+    .bubble:nth-child(15) { width:8px;  height:8px;  left:80%; animation-duration:12s; animation-delay:4.5s; }
+
+    /* ── Nav ───────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(2,15,26,.95), transparent);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--white-soft);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--teal); text-shadow: 0 0 20px rgba(0,180,216,.7); }
+    .nav-cta {
+      background: var(--teal);
+      color: var(--ocean-deep);
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: .85rem;
+      padding: .5rem 1.25rem;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all .2s;
+      box-shadow: 0 0 20px rgba(0,180,216,.35);
+    }
+    .nav-cta:hover {
+      background: #00d4f5;
+      box-shadow: 0 0 30px rgba(0,180,216,.65);
+      transform: translateY(-1px);
+    }
+
+    /* ── Swimming fish ─────────────────────────────── */
+    .swimmer {
+      position: fixed;
+      font-size: 2rem;
+      pointer-events: none;
+      z-index: 1;
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+    @keyframes swim-right {
+      0%   { transform: translateX(-120px) translateY(0); opacity: 0; }
+      5%   { opacity: 1; }
+      48%  { transform: translateX(calc(100vw + 120px)) translateY(-25px); opacity: 1; }
+      49%  { opacity: 0; }
+      100% { transform: translateX(calc(100vw + 120px)) translateY(-25px); opacity: 0; }
+    }
+    @keyframes swim-left {
+      0%   { transform: translateX(calc(100vw + 120px)) translateY(0) scaleX(-1); opacity: 0; }
+      5%   { opacity: 1; }
+      48%  { transform: translateX(-120px) translateY(18px) scaleX(-1); opacity: 1; }
+      49%  { opacity: 0; }
+      100% { transform: translateX(-120px) translateY(18px) scaleX(-1); opacity: 0; }
+    }
+    .swimmer-1 { top: 22%; color: var(--red);    animation: swim-right 18s ease-in-out 2s  infinite; }
+    .swimmer-2 { top: 60%; color: var(--green);  animation: swim-left  22s ease-in-out 5s  infinite; }
+    .swimmer-3 { top: 38%; color: var(--yellow); animation: swim-right 26s ease-in-out 9s  infinite; }
+    .swimmer-4 { top: 75%; color: var(--orange); animation: swim-left  20s ease-in-out 1s  infinite; }
+
+    /* ── Hero ──────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 5rem;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 30%; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, rgba(0,180,216,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 680px;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(0,180,216,.1);
+      border: 1px solid rgba(0,180,216,.3);
+      border-radius: 100px;
+      padding: .4rem 1rem;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      animation: fadeInDown .8s ease both;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 12vw, 7rem);
+      line-height: 1;
+      margin-bottom: .5rem;
+      animation: fadeInUp .8s ease .1s both;
+    }
+    .hero-title .reef  { color: var(--white-soft); }
+    .hero-title .tally { color: var(--teal); text-shadow: 0 0 50px rgba(0,180,216,.55), 0 0 100px rgba(0,180,216,.25); }
+    .hero-tagline {
+      font-size: clamp(1.05rem, 3vw, 1.35rem);
+      font-weight: 600;
+      color: rgba(232,244,248,.65);
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+      animation: fadeInUp .8s ease .2s both;
+    }
+    .hero-tagline strong { color: var(--white-soft); }
+
+    .fish-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+      animation: fadeInUp .8s ease .3s both;
+    }
+    .fish-chip {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .5rem 1.1rem;
+      border-radius: 100px;
+      font-weight: 800;
+      font-size: .95rem;
+      transition: transform .2s, box-shadow .2s;
+      cursor: default;
+    }
+    .fish-chip:hover { transform: translateY(-3px) scale(1.06); }
+    .fish-chip.red    { background: rgba(255,45,85,.12);  border: 1.5px solid rgba(255,45,85,.4);  color: var(--red);    box-shadow: 0 0 18px rgba(255,45,85,.12); }
+    .fish-chip.green  { background: rgba(0,230,118,.12);  border: 1.5px solid rgba(0,230,118,.4);  color: var(--green);  box-shadow: 0 0 18px rgba(0,230,118,.12); }
+    .fish-chip.yellow { background: rgba(255,229,0,.12);  border: 1.5px solid rgba(255,229,0,.4);  color: var(--yellow); box-shadow: 0 0 18px rgba(255,229,0,.12); }
+    .fish-chip.orange { background: rgba(255,109,0,.12);  border: 1.5px solid rgba(255,109,0,.4);  color: var(--orange); box-shadow: 0 0 18px rgba(255,109,0,.12); }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp .8s ease .4s both;
+    }
+    .btn-play {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      background: #000;
+      border: 1.5px solid rgba(255,255,255,.15);
+      border-radius: 14px;
+      padding: .8rem 1.6rem;
+      text-decoration: none;
+      transition: all .25s;
+      box-shadow: 0 4px 24px rgba(0,0,0,.5);
+    }
+    .btn-play:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0,180,216,.5);
+      box-shadow: 0 8px 40px rgba(0,180,216,.2), 0 4px 24px rgba(0,0,0,.5);
+    }
+    .btn-play-text small {
+      display: block;
+      font-size: .62rem;
+      color: rgba(255,255,255,.7);
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .btn-play-text span {
+      display: block;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    /* ── Wave dividers ─────────────────────────────── */
+    .wave {
+      position: relative;
+      z-index: 2;
+      line-height: 0;
+      overflow: hidden;
+    }
+    .wave svg { display: block; width: 100%; }
+
+    /* ── Section base ──────────────────────────────── */
+    .section-label {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: .75rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--white-soft);
+    }
+    .section-title .accent { color: var(--teal); }
+    .section-sub {
+      color: rgba(232,244,248,.55);
+      font-size: 1rem;
+      margin-top: .75rem;
+      max-width: 480px;
+      margin-inline: auto;
+      line-height: 1.65;
+    }
+
+    /* ── Features ──────────────────────────────────── */
+    .features {
+      position: relative;
+      z-index: 2;
+      padding: 5rem 2rem;
+      background: var(--ocean-mid);
+    }
+    .features .section-header { text-align: center; margin-bottom: 3rem; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1.25rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all .3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 20px 20px 0 0;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .feature-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,.13); }
+    .feature-card:hover::after { opacity: 1; }
+    .feature-card.c-teal::after  { background: var(--teal); }
+    .feature-card.c-teal:hover   { box-shadow: 0 8px 40px rgba(0,180,216,.15); }
+    .feature-card.c-green::after { background: var(--green); }
+    .feature-card.c-green:hover  { box-shadow: 0 8px 40px rgba(0,230,118,.15); }
+    .feature-card.c-orange::after { background: var(--orange); }
+    .feature-card.c-orange:hover  { box-shadow: 0 8px 40px rgba(255,109,0,.15); }
+    .feature-icon { font-size: 2.4rem; margin-bottom: 1rem; display: block; }
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      margin-bottom: .5rem;
+      color: var(--white-soft);
+    }
+    .feature-desc {
+      color: rgba(232,244,248,.55);
+      font-size: .93rem;
+      line-height: 1.7;
+    }
+
+    /* ── Reef Report ───────────────────────────────── */
+    .reef-report {
+      position: relative;
+      z-index: 2;
+      padding: 5rem 2rem;
+      background: var(--ocean-deep);
+      overflow: hidden;
+    }
+    .reef-report::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, rgba(0,180,216,.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .reef-report .section-header { text-align: center; margin-bottom: 2.5rem; position: relative; z-index: 1; }
+    .report-card {
+      max-width: 680px;
+      margin: 0 auto;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(0,180,216,.15);
+      border-radius: 24px;
+      padding: 2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .report-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+    .report-head-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--white-soft);
+    }
+    .live-badge {
+      background: rgba(0,230,118,.15);
+      border: 1px solid rgba(0,230,118,.3);
+      color: var(--green);
+      font-size: .72rem;
+      font-weight: 800;
+      padding: .28rem .75rem;
+      border-radius: 100px;
+      letter-spacing: .08em;
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+    }
+    .live-dot {
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 1.4s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .4; transform: scale(.7); }
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .bar-label {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      width: 100px;
+      flex-shrink: 0;
+      font-weight: 800;
+      font-size: .88rem;
+    }
+    .bar-track {
+      flex: 1;
+      height: 30px;
+      background: rgba(255,255,255,.05);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      font-size: .75rem;
+      font-weight: 800;
+      color: var(--ocean-deep);
+      width: 0%;
+      transition: width 1.4s cubic-bezier(.4,0,.2,1);
+    }
+    .bar-fill.red    { background: linear-gradient(90deg, rgba(255,45,85,.5),  var(--red));    box-shadow: 4px 0 20px rgba(255,45,85,.4); }
+    .bar-fill.green  { background: linear-gradient(90deg, rgba(0,230,118,.5),  var(--green));  box-shadow: 4px 0 20px rgba(0,230,118,.4); }
+    .bar-fill.yellow { background: linear-gradient(90deg, rgba(255,229,0,.5),  var(--yellow)); box-shadow: 4px 0 20px rgba(255,229,0,.4); }
+    .bar-fill.orange { background: linear-gradient(90deg, rgba(255,109,0,.5),  var(--orange)); box-shadow: 4px 0 20px rgba(255,109,0,.4); }
+
+    .report-foot {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+      font-size: .82rem;
+      color: rgba(232,244,248,.35);
+    }
+    .report-foot strong { color: var(--teal); }
+
+    /* ── Download ──────────────────────────────────── */
+    .download {
+      position: relative;
+      z-index: 2;
+      padding: 6rem 2rem;
+      text-align: center;
+      background: var(--ocean-mid);
+      overflow: hidden;
+    }
+    .download::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center bottom, rgba(0,180,216,.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .download-content {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .download-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 7vw, 3.75rem);
+      color: var(--white-soft);
+      line-height: 1.1;
+      margin-bottom: .75rem;
+    }
+    .download-title .accent {
+      color: var(--teal);
+      text-shadow: 0 0 40px rgba(0,180,216,.5);
+    }
+    .download-sub {
+      color: rgba(232,244,248,.55);
+      margin-bottom: 2.5rem;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 2;
+      background: var(--ocean-deep);
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--teal);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1.25rem;
+      opacity: .65;
+      transition: opacity .2s;
+    }
+    .footer-logo:hover { opacity: 1; }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .footer-links a {
+      color: rgba(232,244,248,.45);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 600;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--teal); }
+    .footer-copy {
+      color: rgba(232,244,248,.2);
+      font-size: .78rem;
+    }
+
+    /* ── Animations ────────────────────────────────── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 560px) {
+      .fish-row { gap: .6rem; }
+      .fish-chip { font-size: .82rem; padding: .4rem .8rem; }
+      .bar-label { width: 80px; font-size: .8rem; }
+      nav { padding: 1rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background bubbles -->
+<div class="bubbles" aria-hidden="true">
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+</div>
+
+<!-- Swimming fish -->
+<div aria-hidden="true">
+  <div class="swimmer swimmer-1">&#x1F420;</div>
+  <div class="swimmer swimmer-2">&#x1F41F;</div>
+  <div class="swimmer swimmer-3">&#x1F421;</div>
+  <div class="swimmer swimmer-4">&#x1F990;</div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <a href="/" class="nav-logo">Reef<span>Tally</span></a>
+  <a href="#download" class="nav-cta">Get the App</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span>&#x1F30A;</span> Track your Scandinavian Swimmers
+    </div>
+    <h1 class="hero-title">
+      <span class="reef">Reef</span><span class="tally">Tally</span>
+    </h1>
+    <p class="hero-tagline">
+      Every bag of Trader Joe's Scandinavian Swimmers hides a color champion.<br>
+      <strong>Which fish wins yours?</strong>
+    </p>
+    <div class="fish-row">
+      <div class="fish-chip red">&#x1F420; Red</div>
+      <div class="fish-chip green">&#x1F41F; Green</div>
+      <div class="fish-chip yellow">&#x1F421; Yellow</div>
+      <div class="fish-chip orange">&#x1F990; Orange</div>
+    </div>
+    <div class="hero-cta">
+      <a href="#download" class="btn-play">
+        <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 4.5L41 24L8 43.5V4.5Z" fill="url(#pg)"/>
+          <defs>
+            <linearGradient id="pg" x1="8" y1="4.5" x2="41" y2="43.5" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00E676"/>
+              <stop offset=".5" stop-color="#00B4D8"/>
+              <stop offset="1" stop-color="#FF2D55"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="btn-play-text">
+          <small>Get it on</small>
+          <span>Google Play</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Wave -->
+<div class="wave">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 64" preserveAspectRatio="none" height="64">
+    <path fill="#041828" d="M0,0 C360,64 1080,0 1440,48 L1440,64 L0,64 Z"/>
+  </svg>
+</div>
+
+<!-- Features -->
+<section class="features">
+  <div class="section-header">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Dive into the <span class="accent">data</span></h2>
+    <p class="section-sub">Simple enough to use mid-snack. Surprisingly hard to stop.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card c-teal">
+      <span class="feature-icon">&#x1F3AF;</span>
+      <h3 class="feature-title">Count Your Catch</h3>
+      <p class="feature-desc">Tap each candy color as you eat through the bag. Haptic feedback makes every tap satisfying. Your totals update instantly.</p>
+    </div>
+    <div class="feature-card c-green">
+      <span class="feature-icon">&#x1F4CA;</span>
+      <h3 class="feature-title">Your Bag History</h3>
+      <p class="feature-desc">Every completed bag is saved. Track personal trends over time — does green always dominate your bags? Now you'll know.</p>
+    </div>
+    <div class="feature-card c-orange">
+      <span class="feature-icon">&#x1F30A;</span>
+      <h3 class="feature-title">The Reef Report</h3>
+      <p class="feature-desc">See real-time global averages from all ReefTally users. Which color reigns supreme across every bag ever counted worldwide?</p>
+    </div>
+  </div>
+</section>
+
+<!-- Wave -->
+<div class="wave" style="background:#041828;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 64" preserveAspectRatio="none" height="64">
+    <path fill="#020f1a" d="M0,40 C480,0 960,64 1440,16 L1440,64 L0,64 Z"/>
+  </svg>
+</div>
+
+<!-- Reef Report -->
+<section class="reef-report">
+  <div class="section-header">
+    <div class="section-label">Live Community Data</div>
+    <h2 class="section-title">The <span class="accent">Reef Report</span></h2>
+    <p class="section-sub">What does the reef say? Global color rankings from every bag ever tallied.</p>
+  </div>
+  <div class="report-card">
+    <div class="report-head">
+      <div class="report-head-title">&#x1F3C6; Global Color Rankings</div>
+      <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+    </div>
+
+    <div class="bar-row">
+      <div class="bar-label" style="color:var(--green)">&#x1F41F; Green</div>
+      <div class="bar-track"><div class="bar-fill green" data-w="83">83%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label" style="color:var(--orange)">&#x1F990; Orange</div>
+      <div class="bar-track"><div class="bar-fill orange" data-w="71">71%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label" style="color:var(--red)">&#x1F420; Red</div>
+      <div class="bar-track"><div class="bar-fill red" data-w="68">68%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label" style="color:var(--yellow)">&#x1F421; Yellow</div>
+      <div class="bar-track"><div class="bar-fill yellow" data-w="54">54%</div></div>
+    </div>
+
+    <div class="report-foot">
+      <span>Updates with every bag submitted</span>
+      <span>Powered by <strong>ReefTally</strong></span>
+    </div>
+  </div>
+</section>
+
+<!-- Wave -->
+<div class="wave" style="background:#020f1a;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 64" preserveAspectRatio="none" height="64">
+    <path fill="#041828" d="M0,20 C480,72 960,-8 1440,44 L1440,64 L0,64 Z"/>
+  </svg>
+</div>
+
+<!-- Download -->
+<section class="download" id="download">
+  <div class="download-content">
+    <h2 class="download-title">Open a bag.<br><span class="accent">Start counting.</span></h2>
+    <p class="download-sub">Free on Android. No account required. Just crack open a bag of Scandinavian Swimmers and start your first tally.</p>
+    <!-- Replace YOUR_PACKAGE_NAME with your actual Play Store package name -->
+    <a href="https://play.google.com/store/apps/details?id=com.reeftally.app" class="btn-play">
+      <svg width="30" height="30" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M8 4.5L41 24L8 43.5V4.5Z" fill="url(#pg2)"/>
+        <defs>
+          <linearGradient id="pg2" x1="8" y1="4.5" x2="41" y2="43.5" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#00E676"/>
+            <stop offset=".5" stop-color="#00B4D8"/>
+            <stop offset="1" stop-color="#FF2D55"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="btn-play-text">
+        <small>Get it on</small>
+        <span>Google Play</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <a href="/" class="footer-logo">ReefTally</a>
+  <div class="footer-links">
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/data-deletion">Data Deletion</a>
+  </div>
+  <p class="footer-copy">&copy; 2026 Emily Casebeer &mdash; Not affiliated with Trader Joe's.</p>
+</footer>
+
+<script>
+  // Animate bars into view on scroll
+  const fills = document.querySelectorAll('.bar-fill');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        fills.forEach((el, i) => {
+          setTimeout(() => {
+            el.style.width = el.dataset.w + '%';
+          }, i * 160);
+        });
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.4 });
+  const card = document.querySelector('.report-card');
+  if (card) observer.observe(card);
+</script>
+
+</body>
+</html>
